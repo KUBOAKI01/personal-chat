@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人聊天软件 — {{ '登录' if page == 'login' else '注册' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>💬 个人聊天</h1>
+                <p>安全、私密、属于你自己的聊天室</p>
+            </div>
+
+            <!-- flash 消息 -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- 标签切换 -->
+            <div class="auth-tabs">
+                <a href="{{ url_for('login') }}" class="tab {{ 'active' if page == 'login' }}">登录</a>
+                <a href="{{ url_for('register') }}" class="tab {{ 'active' if page == 'register' }}">注册</a>
+            </div>
+
+            {% if page == 'login' %}
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username"
+                           placeholder="请输入用户名" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password"
+                           placeholder="请输入密码" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登 录</button>
+            </form>
+            {% else %}
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username"
+                           placeholder="2~50 个字符" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password"
+                           placeholder="至少 4 位" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm">确认密码</label>
+                    <input type="password" id="confirm" name="confirm"
+                           placeholder="再次输入密码" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">注 册</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

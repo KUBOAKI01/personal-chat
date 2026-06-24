@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室 — {{ current_user.username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body class="chat-page">
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="current-user">
+                <div class="avatar-upload-wrapper" id="avatarUploadWrapper" title="点击更换头像">
+                    <span class="avatar" id="myAvatar">{{ current_user.avatar or '😊' }}</span>
+                    <span class="avatar-overlay">📷</span>
+                </div>
+                <span class="username">{{ current_user.username }}</span>
+            </div>
+            <div class="sidebar-header-actions">
+                {% if current_user.is_admin %}
+                <button class="btn btn-small btn-admin" id="adminPanelBtn" title="管理面板">⚙</button>
+                {% endif %}
+                <button class="btn-icon" id="collapseSidebarBtn" title="收起侧边栏">☰</button>
+                <button class="btn-settings" id="settingsBtn" title="设置">⚙</button>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline" title="退出">退出</a>
+            </div>
+        </div>
+
+        <!-- 设置面板 -->
+        <div class="settings-panel hidden" id="settingsPanel">
+            <div class="settings-panel-header">
+                <span id="settingsTitle">⚙ 设置</span>
+                <button class="btn-icon btn-icon-sm" id="closeSettingsBtn">✕</button>
+            </div>
+            <div class="settings-section">
+                <div class="settings-label" id="themeLabel">主题 Theme</div>
+                <div class="theme-grid" id="themeGrid">
+                    <div class="theme-option active" data-theme="light"><div class="theme-swatch light"></div><span class="theme-name">Light</span></div>
+                    <div class="theme-option" data-theme="dark"><div class="theme-swatch dark"></div><span class="theme-name">Dark</span></div>
+                    <div class="theme-option" data-theme="ocean"><div class="theme-swatch ocean"></div><span class="theme-name">Ocean</span></div>
+                    <div class="theme-option" data-theme="forest"><div class="theme-swatch forest"></div><span class="theme-name">Forest</span></div>
+                    <div class="theme-option" data-theme="purple"><div class="theme-swatch purple"></div><span class="theme-name">Purple</span></div>
+                    <div class="theme-option" data-theme="sunset"><div class="theme-swatch sunset"></div><span class="theme-name">Sunset</span></div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="settings-label" id="langLabel">语言 Language</div>
+                <div class="lang-options" id="langOptions">
+                    <div class="lang-option active" data-lang="zh">中文</div>
+                    <div class="lang-option" data-lang="en">English</div>
+                    <div class="lang-option" data-lang="ja">日本語</div>
+                    <div class="lang-option" data-lang="ko">한국어</div>
+                    <div class="lang-option" data-lang="ru">Русский</div>
+                    <div class="lang-option" data-lang="fr">Français</div>
+                    <div class="lang-option" data-lang="es">Español</div>
+                    <div class="lang-option" data-lang="de">Deutsch</div>
+                    <div class="lang-option" data-lang="pt">Português</div>
+                    <div class="lang-option" data-lang="ar">العربية</div>
+                    <div class="lang-option" data-lang="it">Italiano</div>
+                    <div class="lang-option" data-lang="tr">Türkçe</div>
+                    <div class="lang-option" data-lang="th">ไทย</div>
+                    <div class="lang-option" data-lang="vi">Tiếng Việt</div>
+                    <div class="lang-option" data-lang="id">Bahasa</div>
+                    <div class="lang-option" data-lang="hi">हिन्दी</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理员面板 -->
+        <div class="admin-panel hidden" id="adminPanel">
+            <div class="admin-panel-header">
+                <span>🔍 管理面板</span>
+                <button class="btn-icon btn-icon-sm" id="closeAdminBtn">✕</button>
+            </div>
+            <!-- 服务器状态 -->
+            <div class="admin-status" id="adminStatus">
+                <div class="status-grid">
+                    <div class="status-item"><span>🖥 CPU</span><b id="statCpu">--</b></div>
+                    <div class="status-item"><span>🧠 内存</span><b id="statMem">--</b></div>
+                    <div class="status-item"><span>💾 磁盘</span><b id="statDisk">--</b></div>
+                    <div class="status-item"><span>⏱ 运行</span><b id="statUptime">--</b></div>
+                    <div class="status-item"><span>🟢 在线</span><b id="statOnline">--</b></div>
+                    <div class="status-item"><span>👥 用户</span><b id="statUsers">--</b></div>
+                    <div class="status-item"><span>💬 消息</span><b id="statMsgs">--</b></div>
+                </div>
+            </div>
+            <div class="admin-users-list" id="adminUsersList">
+                <div class="loading-text">加载用户列表…</div>
+            </div>
+            <div class="admin-convo hidden" id="adminConvo">
+                <div class="admin-convo-header">
+                    <span id="adminConvoTitle">聊天记录</span>
+                    <button class="btn btn-small btn-outline" id="adminConvoBack">← 返回</button>
+                </div>
+                <div class="admin-messages" id="adminMessages"></div>
+            </div>
+        </div>
+
+        <!-- 标签切换 -->
+        <div class="sidebar-tabs">
+            <button class="s-tab active" data-tab="friends">好友</button>
+            <button class="s-tab" data-tab="add">添加好友</button>
+        </div>
+
+        <!-- 好友列表面板 -->
+        <div class="sidebar-panel" id="panelFriends">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索好友…" autocomplete="off">
+            </div>
+            <div class="contact-list" id="contactList">
+                <div class="loading-text">加载中…</div>
+            </div>
+        </div>
+
+        <!-- 添加好友面板 -->
+        <div class="sidebar-panel hidden" id="panelAdd">
+            <div class="search-box">
+                <input type="text" id="addSearchInput" placeholder="输入用户名搜索…" autocomplete="off">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <div class="friend-requests-section">
+                <div class="section-title">好友请求 <span class="badge hidden" id="requestBadge">0</span></div>
+                <div class="request-list" id="requestList">
+                    <div class="loading-text" id="noRequests">暂无好友请求</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 主区域 -->
+    <main class="chat-main">
+        <div class="chat-empty" id="chatEmpty">
+            <div class="empty-content">
+                <span class="empty-icon">💬</span>
+                <h2>欢迎使用个人聊天</h2>
+                <p>从左侧选择一个好友，开始聊天吧！</p>
+                <p class="empty-hint">还没有好友？点击「添加好友」搜索并添加</p>
+            </div>
+        </div>
+
+        <div class="chat-window hidden" id="chatWindow">
+            <div class="chat-header">
+                <button class="btn-icon" id="expandSidebarBtn" title="展开侧边栏" style="margin-right:8px">☰</button>
+                <div class="chat-contact-info">
+                    <span class="avatar" id="chatAvatar">😊</span>
+                    <div>
+                        <div class="chat-contact-name" id="chatName">—</div>
+                        <div class="chat-contact-status" id="chatStatus"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="messages-list" id="messagesList"></div>
+            </div>
+
+            <div class="typing-indicator hidden" id="typingIndicator">对方正在输入…</div>
+
+            <div class="message-input-area">
+                <form id="messageForm" autocomplete="off">
+                    <button type="button" class="btn-icon btn-icon-attach" id="attachBtn" title="发送文件">📎</button>
+                    <input type="text" id="messageInput"
+                           placeholder="输入消息，按 Enter 发送…"
+                           autocomplete="off">
+                    <button type="submit" class="btn btn-primary" id="sendBtn">发送</button>
+                </form>
+                <div class="file-preview hidden" id="filePreview">
+                    <span id="filePreviewName"></span>
+                    <button type="button" class="btn-icon btn-icon-sm" id="filePreviewCancel">✕</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 隐藏的文件上传 input -->
+    <input type="file" id="avatarFileInput" accept="image/*" style="display:none">
+    <input type="file" id="chatFileInput" style="display:none">
+
+    <script>
+        const CURRENT_USER_ID = {{ current_user.id }};
+        const CURRENT_USER_IS_ADMIN = {{ 'true' if current_user.is_admin else 'false' }};
+        const CURRENT_USER_AVATAR = "{{ current_user.avatar or '😊' }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
