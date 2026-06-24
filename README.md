@@ -1,89 +1,86 @@
-# 💬 Personal Chat
+# 💬 Personal Chat / 个人聊天
 
-A self-hosted real-time chat application built with Python Flask + Socket.IO.
+[English](#english) | [中文](#中文)
 
-## ✨ Features
+A self-hosted real-time chat application built with Python Flask + Socket.IO. / 基于 Python Flask + Socket.IO 的自托管实时聊天应用。
 
-- 🔐 **User system** — Register, login, password hashing
-- 💬 **Real-time messaging** — WebSocket via Socket.IO, instant delivery
-- 👥 **Friend system** — Add, accept, reject, delete friends
-- 🛡️ **Super admin** — View any conversation without trace, server status dashboard
-- 🖼️ **Avatar upload** — Custom profile pictures
-- 📎 **File sharing** — Send files in chat
-- 🎨 **6 color themes** — Light, Dark, Ocean, Forest, Purple, Sunset
-- 🌍 **16 languages** — 中文, English, 日本語, 한국어, Русский, Français, Español, Deutsch, Português, العربية, Italiano, Türkçe, ไทย, Tiếng Việt, Bahasa, हिन्दी
-- 📱 **Responsive design** — Collapsible sidebar, mobile-friendly
-- 🔒 **HTTPS ready** — Nginx reverse proxy + Let's Encrypt SSL
+## ✨ Features / 功能特性
 
-## 📁 Project Structure
+| Feature 功能 | Description 说明 |
+|-------------|-----------------|
+| 🔐 User system 用户系统 | Register, login, password hashing 注册、登录、密码哈希 |
+| 💬 Real-time chat 实时聊天 | WebSocket via Socket.IO 消息即时推送 |
+| 👥 Friend system 好友系统 | Add, accept, reject, delete 添加、接受、拒绝、删除 |
+| 🛡️ Super admin 超级管理员 | View conversations without trace 查看任意对话不留痕迹 |
+| 🖼️ Avatar upload 头像上传 | Custom profile pictures 自定义头像 |
+| 📎 File sharing 文件发送 | Send files in chat 聊天中发送文件 |
+| 🎨 6 color themes 六种主题 | Light, Dark, Ocean, Forest, Purple, Sunset |
+| 🌍 16 languages 多语言 | EN/中文/日本語/한국어/RU/FR/ES/DE/PT/AR/IT/TR/TH/VI/ID/HI |
+| 📱 Responsive 响应式 | Collapsible sidebar, mobile-friendly 可折叠侧边栏 |
+| 🔒 HTTPS ready 加密 | Nginx + Let's Encrypt SSL 自动续签 |
+
+## 📁 Project Structure / 项目结构
 
 ```
-├── app.py                # Main Flask + SocketIO server
-├── requirements.txt      # Python dependencies
-├── start.bat             # Windows launcher
+├── app.py                # Main server / 主程序
+├── requirements.txt      # Dependencies / 依赖
+├── start.bat             # Windows launcher / 启动脚本
 ├── .gitignore
 ├── templates/
-│   ├── index.html        # Login / Register page
-│   └── chat.html         # Chat interface
+│   ├── index.html        # Login & Register / 登录注册页
+│   └── chat.html         # Chat UI / 聊天界面
 └── static/
-    ├── css/style.css     # 6 themed color schemes
-    ├── js/chat.js        # 16-language client logic
-    └── uploads/          # User uploads (avatars, files)
+    ├── css/style.css     # 6 themed styles / 主题样式
+    ├── js/chat.js        # Client logic / 前端逻辑
+    └── uploads/          # Avatars & files / 头像文件
 ```
-
-## 🚀 Quick Start (Local)
-
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
-
-# 2. Run
-python app.py
-
-# 3. Open http://localhost:5000
-```
-
-**Default admin**: `admin` / `admin123`
 
 ---
 
-## 🖥 Deploy to Linux Server
+# 中文
 
-Tested on **Ubuntu 20.04/22.04** with **Alibaba Cloud ECS**.
-
-### Step 1 — Server preparation
+## 🚀 本地快速启动
 
 ```bash
-# Update system
-apt update && apt upgrade -y
+# 1. 安装依赖
+pip install -r requirements.txt
 
-# Install Python & tools
+# 2. 启动
+python app.py
+
+# 3. 浏览器打开 http://localhost:5000
+```
+
+**默认管理员**: `admin` / `admin123`
+
+---
+
+## 🖥 部署到 Linux 服务器
+
+以 **Ubuntu 20.04/22.04** + **阿里云 ECS** 为例。
+
+### 第一步 — 服务器准备
+
+```bash
+apt update && apt upgrade -y
 apt install -y python3 python3-pip nginx
 ```
 
-### Step 2 — Upload project
+### 第二步 — 上传项目
 
 ```bash
-# Create app directory
 mkdir -p /opt/chat-app
-
-# Upload files (via scp, git clone, or any method)
-# After uploading, the structure should be:
-# /opt/chat-app/
-#   ├── app.py
-#   ├── requirements.txt
-#   ├── templates/
-#   └── static/
+# 通过 scp / git clone / 网页上传等方式将文件传至 /opt/chat-app/
 ```
 
-### Step 3 — Install dependencies
+### 第三步 — 安装依赖
 
 ```bash
 cd /opt/chat-app
 pip3 install -r requirements.txt
 ```
 
-### Step 4 — Create systemd service
+### 第四步 — 创建 systemd 服务
 
 ```bash
 cat > /etc/systemd/system/chat-server.service << 'EOF'
@@ -109,7 +106,7 @@ systemctl enable chat-server
 systemctl start chat-server
 ```
 
-### Step 5 — Configure Nginx
+### 第五步 — 配置 Nginx
 
 ```bash
 cat > /etc/nginx/sites-available/chat << 'EOF'
@@ -166,87 +163,216 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 ```
 
-### Step 6 — Configure firewall
+### 第六步 — 配置防火墙
 
 ```bash
-# UFW
+# 服务器防火墙
 ufw allow 80/tcp
 ufw allow 443/tcp
-ufw allow 5000/tcp    # optional, if accessing directly
+ufw allow 5000/tcp
 
-# Alibaba Cloud: also open 80, 443 in security group console!
+# 阿里云：还需要在安全组控制台开放 80、443 端口！
 ```
 
-### Step 7 — HTTPS with Let's Encrypt
+### 第七步 — 配置 HTTPS 证书 (Let's Encrypt)
 
 ```bash
-# Install acme.sh
+# 安装 acme.sh
 curl https://get.acme.sh | sh -s email=admin@your-domain.com
 
-# Issue certificate (DNS challenge recommended)
+# 获取证书（推荐 DNS 验证）
 ~/.acme.sh/acme.sh --issue --dns -d your-domain.com \
     --yes-I-know-dns-manual-mode-enough-go-ahead-please
 
-# Add the TXT record to your DNS, then renew:
+# 去 DNS 控制台添加输出的 TXT 记录，然后续期：
 ~/.acme.sh/acme.sh --renew -d your-domain.com \
     --yes-I-know-dns-manual-mode-enough-go-ahead-please
 
-# Install certificate
+# 安装证书到 Nginx
 mkdir -p /etc/nginx/ssl
 ~/.acme.sh/acme.sh --install-cert -d your-domain.com \
     --key-file /etc/nginx/ssl/your-domain.com.key \
     --fullchain-file /etc/nginx/ssl/your-domain.com.pem \
     --reloadcmd "systemctl reload nginx"
 
-# Auto-renewal is set up automatically (daily cron)
+# 自动续签已默认开启（每日 cron）
+```
+
+### 第八步 — 验证
+
+```bash
+systemctl status chat-server nginx
+curl -I https://your-domain.com/login
+```
+
+---
+
+## 🔧 管理命令
+
+```bash
+systemctl status chat-server    # 查看状态
+systemctl restart chat-server   # 重启
+journalctl -u chat-server -f    # 查看日志
+nginx -t                        # 测试 Nginx 配置
+systemctl reload nginx          # 重载 Nginx
+```
+
+## 🛡️ 管理员
+
+| 项目 | 值 |
+|------|-----|
+| 用户名 | `admin` |
+| 密码 | `admin123` |
+
+首次启动自动创建。登录后点击侧边栏红色 ⚙ 按钮进入管理面板，可查看服务器状态、用户列表、任意用户的聊天记录。
+
+---
+
+## 🛠 技术栈
+
+| 层级 | 技术 |
+|------|------|
+| 后端 | Flask 3.x + Flask-SocketIO |
+| 数据库 | SQLite + Flask-SQLAlchemy |
+| 实时通信 | WebSocket (Socket.IO) |
+| 认证 | Flask-Login + Werkzeug |
+| 前端 | 原生 HTML/CSS/JS |
+| Web 服务器 | Nginx |
+| SSL | Let's Encrypt via acme.sh |
+
+## 📄 许可证
+
+MIT
+
+---
+
+# English
+
+## 🚀 Quick Start
+
+```bash
+pip install -r requirements.txt
+python app.py
+# Open http://localhost:5000
+```
+
+**Default admin**: `admin` / `admin123`
+
+---
+
+## 🖥 Linux Deployment
+
+Tested on **Ubuntu 20.04/22.04**.
+
+### Step 1 — Server Setup
+
+```bash
+apt update && apt upgrade -y
+apt install -y python3 python3-pip nginx
+```
+
+### Step 2 — Upload Project
+
+```bash
+mkdir -p /opt/chat-app
+# Upload all files to /opt/chat-app/ (scp, git clone, etc.)
+```
+
+### Step 3 — Install Dependencies
+
+```bash
+cd /opt/chat-app
+pip3 install -r requirements.txt
+```
+
+### Step 4 — Create systemd Service
+
+```bash
+cat > /etc/systemd/system/chat-server.service << 'EOF'
+[Unit]
+Description=Personal Chat Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/chat-app
+ExecStart=/usr/bin/python3 /opt/chat-app/app.py
+Restart=always
+RestartSec=3
+Environment=PORT=5000
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now chat-server
+```
+
+### Step 5 — Configure Nginx
+
+Create `/etc/nginx/sites-available/chat` (see Chinese section above for full config), then:
+
+```bash
+ln -sf /etc/nginx/sites-available/chat /etc/nginx/sites-enabled/chat
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx
+```
+
+### Step 6 — Firewall
+
+```bash
+ufw allow 80/tcp
+ufw allow 443/tcp
+# Also open 80/443 in your cloud provider's security group!
+```
+
+### Step 7 — HTTPS with Let's Encrypt
+
+```bash
+curl https://get.acme.sh | sh -s email=admin@your-domain.com
+
+~/.acme.sh/acme.sh --issue --dns -d your-domain.com \
+    --yes-I-know-dns-manual-mode-enough-go-ahead-please
+
+# Add the TXT record to DNS, then:
+~/.acme.sh/acme.sh --renew -d your-domain.com \
+    --yes-I-know-dns-manual-mode-enough-go-ahead-please
+
+mkdir -p /etc/nginx/ssl
+~/.acme.sh/acme.sh --install-cert -d your-domain.com \
+    --key-file /etc/nginx/ssl/your-domain.com.key \
+    --fullchain-file /etc/nginx/ssl/your-domain.com.pem \
+    --reloadcmd "systemctl reload nginx"
 ```
 
 ### Step 8 — Verify
 
 ```bash
-# Check services
 systemctl status chat-server nginx
-
-# Test HTTPS
 curl -I https://your-domain.com/login
-
-# Done! 🎉
 ```
 
 ---
 
-## 🔧 Management Commands
+## 🔧 Management
 
 ```bash
-# Chat server
-systemctl status chat-server   # View status
-systemctl restart chat-server  # Restart
-journalctl -u chat-server -f   # Tail logs
-
-# Nginx
-nginx -t                       # Test config
-systemctl reload nginx         # Reload config
+systemctl status chat-server    # Status
+systemctl restart chat-server   # Restart
+journalctl -u chat-server -f    # Logs
+nginx -t && systemctl reload nginx
 ```
 
----
+## 🛡️ Admin
 
-## 🛡️ Default Admin
+| Field | Value |
+|-------|-------|
+| Username | `admin` |
+| Password | `admin123` |
 
-- **Username**: `admin`
-- **Password**: `admin123`
-
-> Automatically created on first startup. Change password after first login.
-
----
-
-## 📊 Admin Panel
-
-Login as admin, click the red ⚙ button in sidebar to access:
-- **Server status**: CPU, RAM, Disk, Uptime, Online users
-- **User list**: All registered users
-- **Conversation viewer**: Click any two users to read their chat history without leaving read receipts
-
----
+Auto-created on first run. Click the red ⚙ in the sidebar after login to access the admin panel.
 
 ## 🛠 Tech Stack
 
@@ -255,9 +381,9 @@ Login as admin, click the red ⚙ button in sidebar to access:
 | Backend | Flask 3.x + Flask-SocketIO |
 | Database | SQLite + Flask-SQLAlchemy |
 | Real-time | WebSocket (Socket.IO) |
-| Auth | Flask-Login + Werkzeug password hashing |
-| Frontend | Vanilla HTML/CSS/JS (no framework) |
-| Web Server | Nginx (reverse proxy) |
+| Auth | Flask-Login + Werkzeug |
+| Frontend | Vanilla HTML/CSS/JS |
+| Web Server | Nginx |
 | SSL | Let's Encrypt via acme.sh |
 
 ## 📄 License
