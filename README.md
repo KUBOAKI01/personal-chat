@@ -24,7 +24,7 @@ A self-hosted real-time chat application built with Python Flask + Socket.IO. / 
 ```
 ├── app.py                # Main server / 主程序
 ├── requirements.txt      # Dependencies / 依赖
-├── start.bat             # Windows launcher / 启动脚本
+├── start.bat             # Windows launcher only / Windows专用启动脚本 (Linux用systemd)
 ├── .gitignore
 ├── templates/
 │   ├── index.html        # Login & Register / 登录注册页
@@ -41,14 +41,19 @@ A self-hosted real-time chat application built with Python Flask + Socket.IO. / 
 
 ## 🚀 本地快速启动
 
+**Windows**：双击 `start.bat` 或：
+
 ```bash
-# 1. 安装依赖
 pip install -r requirements.txt
-
-# 2. 启动
 python app.py
+# 打开 http://localhost:5000
+```
 
-# 3. 浏览器打开 http://localhost:5000
+**Linux**：不要用 `start.bat`（那是 Windows 专用的），直接用 systemd 管理（见下方部署步骤），或手动启动：
+
+```bash
+pip install -r requirements.txt
+python app.py
 ```
 
 **默认管理员**: `admin` / `admin123`
@@ -250,10 +255,18 @@ MIT
 
 ## 🚀 Quick Start
 
+**Windows**: Double-click `start.bat`, or:
+
 ```bash
 pip install -r requirements.txt
 python app.py
-# Open http://localhost:5000
+```
+
+**Linux**: Do NOT use `start.bat` (it's Windows-only). On Linux, use systemd (see deployment steps below), or manually:
+
+```bash
+pip install -r requirements.txt
+python app.py
 ```
 
 **Default admin**: `admin` / `admin123`
